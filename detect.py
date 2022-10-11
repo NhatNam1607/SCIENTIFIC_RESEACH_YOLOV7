@@ -55,7 +55,6 @@ detector = Predictor(config)
 
 
 def craft_text_func(list_img:list,craft_net,refine_net):
-    
     opencvImage = cv2.cvtColor(np.array(list_img), cv2.COLOR_RGB2BGR)
     prediction_result = get_prediction(
     image= opencvImage,
@@ -158,7 +157,7 @@ def Text_detect(list_predict:list,list_index,list_img,craft_net,refine_net):
     s= ''
     if len(i) == 4:
       if i[2] != i[3]:
-        s = i[0] + " " + detector.predict(list_img[list_index.index(i[3])],craft_net,refine_net) + " tới" + craft_text_func(list_img[list_index.index(i[2])],craft_net,refine_net)       
+        s = i[0] + " " + craft_text_func(list_img[list_index.index(i[3])],craft_net,refine_net) + " tới" + craft_text_func(list_img[list_index.index(i[2])],craft_net,refine_net)       
       if i[2] == i[3]:
         s = i[0] + " tới" + craft_text_func(list_img[list_index.index(i[2])],craft_net,refine_net) + " hoặc " + craft_text_func(list_img[list_index.index(i[3])+1],craft_net,refine_net)   
     Text.append(s) 
