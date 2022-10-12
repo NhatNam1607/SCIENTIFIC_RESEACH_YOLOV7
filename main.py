@@ -87,7 +87,7 @@ if __name__ == '__main__':
                     picture = picture.save(f'images/{uploaded_file.name}')
                     opt.source = f'images/{uploaded_file.name}'
                     result, image_detect = detect(opt)
-                    #image_detect = cv2.resize(image_detect, (640, 640))
+                    image_detect = cv2.resize(image_detect, (640, 640))
                     st.subheader('This is a image detected')
                     st.image(image_detect)
                     #st.subheader('This is a text recognized')

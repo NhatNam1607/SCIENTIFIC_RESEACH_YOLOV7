@@ -216,9 +216,7 @@ def detect(optt, save_img=False):
       model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))
 
     img0 = cv2.imread(source_image_path)
-    img0_copy = img0.copy()
-    img_copy = img0.copy()
-    img_copy= cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
+    img_copy= cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(img_copy)
     img = letterbox(img0, imgsz, stride=stride)[0]
     img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
@@ -228,10 +226,9 @@ def detect(optt, save_img=False):
     img /= 255.0  # 0 - 255 to 0.0 - 1.0
     if img.ndimension() == 3:
       img = img.unsqueeze(0)
-    img_ = img
     # Inference
     t1 = time_synchronized()
-    pred = model(img, augment= False)[0]
+    pred1 = pred = model(img, augment= False)[0]
 
     # Apply NMS
     classes = None
@@ -243,27 +240,17 @@ def detect(optt, save_img=False):
 
 
     pred = non_max_suppression(pred, opt['conf-thres'], opt['iou-thres'], classes= classes, agnostic= False)
-    pred_copy= pred.copy()
-    for i, det in enumerate(pred):
-      gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]
-
-    pred=np.array(scale_coords(img.shape[2:], det[:, :], img0.shape).round())
-    list_img = []
-    list_index = []
-    for x1, y1, x2, y2, conf, class_id in pred:
-          list_index.append(class_id)    
-          im_pil=image.crop((x1,y1, x2, y2))
-          list_img.append(im_pil)
-
+  
+    pred_copy = non_max_suppression(pred1, opt['conf-thres'], opt['iou-thres'], classes= classes, agnostic= False)
     
 
     
     for i, det_ in enumerate(pred_copy):
       s = ''
-      s += '%gx%g ' % img_.shape[2:]  # print string
-      gn = torch.tensor(img0_copy.shape)[[1, 0, 1, 0]]
+      s += '%gx%g ' % img.shape[2:]  # print string
+      gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]
       if len(det_):
-        det_[:, :4] = scale_coords(img_.shape[2:], det_[:, :4], img0_copy.shape).round()
+        det_[:, :4] = scale_coords(img.shape[2:], det_[:, :4], img0.shape).round()
 
         for c in det_[:, -1].unique():
           n = (det_[:, -1] == c).sum()  # detections per class
@@ -271,14 +258,25 @@ def detect(optt, save_img=False):
       
         for *xyxy, conf, cls in reversed(det_):
           label = f'{names[int(cls)]} {conf:.2f}'
-          plot_one_box(xyxy, img0_copy, label=label, color=colors[int(cls)], line_thickness=1)
+          plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
+          
+    for i, det in enumerate(pred):
+      gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]
+
+    pred = np.array(scale_coords(img.shape[2:], det[:, :], img0.shape).round())
+    list_img = []
+    list_index = []
+    for x1, y1, x2, y2, conf, class_id in pred:
+          list_index.append(class_id)    
+          im_pil=image.crop((x1,y1, x2, y2))
+          list_img.append(im_pil)
 
     list_predict = Crear_drection_list(list_index)
     s=Text_detect(list_predict,list_index,list_img,craft_net,refine_net)  
 
     text = ''
     for i in s:
-      text = text + i.upper() + "/"
+      text = text + i.upper() + ", "
     from gtts import gTTS
     gtts_object = gTTS(text = text, 
                   lang = 'vi',
@@ -287,10 +285,10 @@ def detect(optt, save_img=False):
     gtts_object.save("audio/gtts.wav")
   
   
-    img0_copy = cv2.cvtColor(img0_copy, cv2.COLOR_BGR2RGB)
+    img0 = cv2.cvtColor(img0 ,cv2.COLOR_BGR2RGB)
   
 
-    return text, img0_copy 
+    return text, img0 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
