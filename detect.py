@@ -229,7 +229,30 @@ def detect(optt, save_img=False):
     # Inference
     t1 = time_synchronized()
     pred1 = pred = model(img, augment= False)[0]
-
+    eng_classes = ["Turn right",          
+    "Right-Location",      
+    "Right-Distance",     
+    "Go straight",         
+    "Straight-Location",   
+    "Straight-Distance",   
+    "Turn left",           
+    "Left-Location",       
+    "Left-Distance",    
+    "Out1",             
+    "Out1-Location",   
+    "Out1-Distance",   
+    "Out2",            
+    "Out2-Location",   
+    "Out2-Distance",   
+    "Out3",       
+    "Out3-Location",
+    "Out3-Distance",
+    "Slant-Right",
+    "Slant-RLocation",
+    "Slant-RDistance",
+    "Slant-Left",
+    "Slant-LLocation",
+    "Slant-LDistance"]
     # Apply NMS
     classes = None
     if opt['classes']:
@@ -257,7 +280,7 @@ def detect(optt, save_img=False):
           s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
       
         for *xyxy, conf, cls in reversed(det_):
-          label = f'{names[int(cls)]} {conf:.2f}'
+          label = f'{eng_classes[int(cls)]} {conf:.2f}'
           plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
           
     for i, det in enumerate(pred):
